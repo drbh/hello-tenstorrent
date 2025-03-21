@@ -44,3 +44,12 @@ uv run scripts/basic.py
 #                   Metal | INFO     | Disabling and clearing program cache on device 0
 #                  Device | INFO     | Closing user mode device drivers
 ```
+
+
+## Running with patched tt_transformer
+
+```bash
+uv sync
+make setup-patch
+uv run scripts/ttransform.py
+```
