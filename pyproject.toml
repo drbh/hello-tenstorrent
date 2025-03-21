@@ -17,3 +17,4 @@ dependencies = [
 [tool.uv.sources]
 ttnn = { url = "https://github.com/tenstorrent/tt-metal/releases/download/v0.55.0/ttnn-0.55.0+any-cp38-cp38-linux_x86_64.whl" }
 torch = { url = "https://download.pytorch.org/whl/cpu/torch-2.2.1%2Bcpu-cp38-cp38-linux_x86_64.whl" }
+tt_transformers = { path = "tt-metal-vendored/models/tt_transformers" }
