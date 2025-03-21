@@ -51,5 +51,7 @@ uv run scripts/basic.py
 ```bash
 uv sync
 make setup-patch
+export PYTHONPATH=/root/hello-tenstorrent/tt-metal-vendored/
+# or maybe export PYTHONPATH=/root/hello-tenstorrent/tt-metal-vendored/models/
 uv run scripts/ttransform.py
 ```
