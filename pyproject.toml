@@ -4,7 +4,15 @@ version = "0.1.0"
 description = "Getting familiar with Tenstorrent's devices and ttnn"
 readme = "README.md"
 requires-python = ">=3.8, <3.9"
-dependencies = ["torch", "ttnn"]
+dependencies = [
+    "multiprocess>=0.70.17",
+    "pytest>=8.3.5",
+    "termcolor>=2.4.0",
+    "torch",
+    "torchvision>=0.17.1",
+    "transformers==4.46.3",
+    "ttnn",
+]
 
 [tool.uv.sources]
 ttnn = { url = "https://github.com/tenstorrent/tt-metal/releases/download/v0.55.0/ttnn-0.55.0+any-cp38-cp38-linux_x86_64.whl" }
