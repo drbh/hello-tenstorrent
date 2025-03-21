@@ -1,0 +1,87 @@
+name: "Custom test dispatch"
+
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        required: true
+        type: choice
+        options:
+          - wormhole_b0
+          - blackhole
+      runner-label:
+        description: 'Optional: N150, N300, BH, config-t3000, config-tg'
+        required: true
+        type: string
+        default: '["in-service"]'
+      build-type:
+        required: false
+        type: choice
+        options:
+          - Release
+          - Debug
+          - RelWithDebInfo
+          - ASan
+          - TSan
+      tracy:
+        required: false
+        type: boolean
+        default: false
+        description: "Build with tracy enabled"
+      command:
+        required: true
+        type: string
+      description:
+        type: string
+        default: "Custom test dispatch"
+        required: false
+
+run-name: ${{ inputs.description }}
+jobs:
+  # setup:
+  #   name: Setup runner labels for deploy
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     deployrunner: ${{ steps.step1.outputs.deployrunner }}
+  #   steps:
+  #     - name: Set runs-on for deploy
+  #       id: step1
+  #       run: |
+  #         # local_var="\'[\"${{ inputs.hw-config }}\", \"${{ inputs.runner-label }}\"]\'"
+  #         echo "deployrunner=${{ inputs.runner-label }}" >> $GITHUB_OUTPUT
+  build-artifact:
+    uses: ./.github/workflows/build-artifact.yaml
+    with:
+      build-type: ${{ inputs.build-type }}
+      tracy: ${{ inputs.tracy }}
+    secrets: inherit
+  test-dispatch:
+    # needs: setup
+    needs: build-artifact
+    timeout-minutes: 1440
+    env:
+      ARCH_NAME: ${{ inputs.arch }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/build/lib
+    runs-on: ${{ fromJSON(inputs.runner-label) }}
+    steps:
+      - uses: tenstorrent/tt-metal/.github/actions/checkout-with-submodule-lfs@main
+      - uses: ./.github/actions/ensure-active-weka-mount
+        timeout-minutes: 3
+        if: ${{ inputs.arch != 'blackhole' }}
+      - name: Set up dyanmic env vars for build
+        run: |
+          echo "TT_METAL_HOME=$(pwd)" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v4
+        timeout-minutes: 10
+        with:
+          name:  TTMetal_build_any${{ (inputs.tracy && '_profiler') || '' }}
+      - name: Extract files
+        run: tar -xvf ttm_any.tar
+      - uses: ./.github/actions/install-python-deps
+      - name: Run pre/post regression tests in a loop
+        run: |
+          source ${{ github.workspace }}/python_env/bin/activate
+          pip install pytest-repeat
+          cd $TT_METAL_HOME
+          export PYTHONPATH=$TT_METAL_HOME
+          ${{ inputs.command }}
