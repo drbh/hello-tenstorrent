@@ -1,0 +1,89 @@
+name: "(TG) Choose your pipeline"
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-type:
+        required: false
+        type: choice
+        options:
+          - Release
+          - Debug
+          - RelWithDebInfo
+          - ASan
+          - TSan
+        default: "Release"
+      build-with-tracy:
+        required: false
+        type: boolean
+        default: false
+      tg-quick:
+        required: false
+        type: boolean
+        default: false
+      tg-unit:
+        required: false
+        type: boolean
+        default: false
+      tg-frequent:
+        required: false
+        type: boolean
+        default: false
+      tg-model-perf:
+        description: "TG model perf tests (requires tracy build)"
+        required: false
+        type: boolean
+        default: false
+      tg-nightly:
+        required: false
+        type: boolean
+        default: false
+
+run-name: ${{ inputs.description }}
+jobs:
+  build-artifact:
+    uses: ./.github/workflows/build-artifact.yaml
+    with:
+      build-type: ${{ inputs.build-type }}
+      tracy: ${{ inputs.build-with-tracy }}
+      build-wheel: true
+    secrets: inherit
+  tg-quick:
+    if: ${{ inputs.tg-quick }}
+    needs: build-artifact
+    uses: ./.github/workflows/tg-quick.yaml
+    with:
+      docker-image: ${{ needs.build-artifact.outputs.ci-build-docker-image }}
+      wheel-artifact-name: ${{ needs.build-artifact.outputs.wheel-artifact-name }}
+      build-artifact-name: ${{ needs.build-artifact.outputs.build-artifact-name }}
+  tg-unit-tests:
+    if: ${{ inputs.tg-unit }}
+    needs: build-artifact
+    uses: ./.github/workflows/tg-unit-tests-impl.yaml
+    with:
+      docker-image: ${{ needs.build-artifact.outputs.ci-build-docker-image }}
+      wheel-artifact-name: ${{ needs.build-artifact.outputs.wheel-artifact-name }}
+      build-artifact-name: ${{ needs.build-artifact.outputs.build-artifact-name }}
+  tg-frequent-tests:
+    if: ${{ inputs.tg-frequent }}
+    needs: build-artifact
+    secrets: inherit
+    uses: ./.github/workflows/tg-frequent-tests-impl.yaml
+    with:
+      docker-image: ${{ needs.build-artifact.outputs.ci-build-docker-image }}
+      wheel-artifact-name: ${{ needs.build-artifact.outputs.wheel-artifact-name }}
+      build-artifact-name: ${{ needs.build-artifact.outputs.build-artifact-name }}
+  tg-model-perf-tests:
+    needs: build-artifact
+    secrets: inherit
+    uses: ./.github/workflows/tg-model-perf-tests-impl.yaml
+    if: ${{ inputs.tg-model-perf }}
+  tg-nightly-tests:
+    needs: build-artifact
+    if: ${{ inputs.tg-nightly }}
+    secrets: inherit
+    uses: ./.github/workflows/tg-nightly-tests-impl.yaml
+    with:
+      docker-image: ${{ needs.build-artifact.outputs.ci-build-docker-image }}
+      wheel-artifact-name: ${{ needs.build-artifact.outputs.wheel-artifact-name }}
+      build-artifact-name: ${{ needs.build-artifact.outputs.build-artifact-name }}
