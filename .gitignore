@@ -9,3 +9,4 @@ wheels/
 # Virtual environments
 .venv
 .ttnn_runtime_artifacts
+model.safetensors

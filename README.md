@@ -55,3 +55,26 @@ export PYTHONPATH=/root/hello-tenstorrent/tt-metal-vendored/
 # or maybe export PYTHONPATH=/root/hello-tenstorrent/tt-metal-vendored/models/
 uv run scripts/ttransform.py
 ```
+
+Compare/explore torch and ttnn simple mlp implementation
+
+```bash
+uv run scripts/mlp/ttmlp.py
+# Creating model
+# ✨ ttnn.Tensor([[[[2048.00000]]]], shape=Shape([1, 1, 1, 1]), dtype=DataType::BFLOAT16, layout=Layout::TILE)
+# Running model
+# ✨ ttnn.Tensor([[[[-0.05713, -0.40820,  ...,  0.35156,  0.51562]]]], shape=Shape([1, 1, 1, 2048]), dtype=DataType::BFLOAT16, layout=Layout::TILE)
+# ✨ ttnn.Tensor([[[[52.50000]]]], shape=Shape([1, 1, 1, 1]), dtype=DataType::BFLOAT16, layout=Layout::TILE)
+# ✨ ttnn.Shape([1, 1, 1[32], 2048])
+```
+
+```bash
+uv run scripts/mlp/ref.py
+# Creating model
+# ✨ tensor(2048., dtype=torch.bfloat16)
+# Running model
+# ✨ tensor([[[[-0.0461, -0.4004, -0.9844,  ...,  0.1709,  0.3594,  0.5352]]]],
+#        dtype=torch.bfloat16)
+# ✨ tensor(49.5000, dtype=torch.bfloat16)
+# ✨ torch.Size([1, 1, 1, 2048])
+```

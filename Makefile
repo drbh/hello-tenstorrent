@@ -50,3 +50,6 @@ lint:
 
 test:
 	pytest -xvs tests/
+
+download-model:
+	wget https://huggingface.co/microsoft/phi-1/resolve/main/model.safetensors
