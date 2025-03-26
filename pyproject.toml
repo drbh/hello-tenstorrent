@@ -3,17 +3,17 @@ name = "hello-tenstorrent"
 version = "0.1.0"
 description = "Getting familiar with Tenstorrent's devices and ttnn"
 readme = "README.md"
-requires-python = ">=3.8, <3.9"
+requires-python = ">=3.10, <3.11"
 dependencies = [
     "multiprocess>=0.70.17",
     "pytest>=8.3.5",
     "termcolor>=2.4.0",
     "torch",
     "torchvision>=0.17.1",
-    "transformers==4.46.3",
     "ttnn",
 ]
 
 [tool.uv.sources]
-ttnn = { url = "https://github.com/tenstorrent/tt-metal/releases/download/v0.55.0/ttnn-0.55.0+any-cp38-cp38-linux_x86_64.whl" }
-torch = { url = "https://download.pytorch.org/whl/cpu/torch-2.2.1%2Bcpu-cp38-cp38-linux_x86_64.whl" }
+ttnn = { url = "https://github.com/tenstorrent/tt-metal/releases/download/v0.56.0/ttnn-0.56.0rc45.dev6+any-cp310-cp310-linux_x86_64.whl" }
+torch = { url = "https://download.pytorch.org/whl/cpu/torch-2.2.1%2Bcpu-cp310-cp310-linux_x86_64.whl" }
+torchvision = { url = "https://download.pytorch.org/whl/cpu/torchvision-0.17.1%2Bcpu-cp310-cp310-linux_x86_64.whl" }
